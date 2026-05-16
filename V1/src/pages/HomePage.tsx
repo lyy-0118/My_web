@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, User, Bot, Briefcase, Heart, Lightbulb, ChevronRight, Github, Mail, Phone } from 'lucide-react';
+import { Send, User, Bot, Briefcase, Heart, Lightbulb, ChevronRight, Github, Mail, Phone, Copy, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ const PERSONAL_INFO = {
   currentWork: '学习 AI 应用，Agent 开发，C++/C 等编程知识，以及常见算法',
   interests: ['AI 应用', '摄影', '旅行'],
   traits: ['做事有规划'],
-  avatarUrl: 'https://miaoda-site-img.cdn.bcebos.com/images/baidu_image_search_ec6b453c-a810-4764-a2e4-037713fefc12.jpg'
+  avatarUrl: '/images/profile.jpg'
 };
 
 const CHAT_RULES = [
@@ -32,6 +32,25 @@ const CHAT_RULES = [
 const DEFAULT_REPLY = '这个问题难倒我了...你可以换个方式问我，或者问问我最近在忙什么？有哪些作品？怎么联系？';
 
 export default function HomePage() {
+  const [copied, setCopied] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const phoneNumber = '19725518835';
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(phoneNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const [messages, setMessages] = useState([
     { role: 'bot', content: '嗨！我是李莹莹的数字分身。想了解关于她的学习经历、作品或者联系方式吗？尽管问我吧。', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
   ]);
@@ -66,42 +85,46 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-700">
-      <main className="max-w-6xl mx-auto px-6 py-12 md:py-24">
+      <main className="max-w-6xl mx-auto px-6 py-16 md:py-28">
         {/* Header Section */}
-        <section className="mb-16 md:mb-24 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <section className="mb-12 md:mb-16 flex flex-row items-center gap-5 md:gap-10">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="shrink-0"
           >
-            <Avatar className="w-28 h-28 md:w-36 md:h-36 ring-4 ring-slate-50 shadow-xl">
+            <Avatar className="w-32 h-32 md:w-40 md:h-40 ring-4 ring-primary/20 shadow-2xl shadow-primary/10">
               <AvatarImage src={PERSONAL_INFO.avatarUrl} className="object-cover" />
-              <AvatarFallback>LYY</AvatarFallback>
+              <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">LYY</AvatarFallback>
             </Avatar>
           </motion.div>
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1 text-left">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, y: -15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
             >
-              <div className="flex flex-col md:flex-row items-center md:items-baseline gap-2 md:gap-4 mb-3">
+              <div className="flex flex-row items-center items-baseline gap-3 md:gap-5 mb-4">
                 <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900">
                   {PERSONAL_INFO.name}
                 </h1>
-                <span className="text-lg md:text-xl text-primary font-medium tracking-wide">
+                <span className="text-lg md:text-xl text-slate-400 font-medium tracking-wider">
                   {PERSONAL_INFO.enName}
                 </span>
               </div>
-              <p className="text-lg md:text-xl text-slate-500 font-light max-w-2xl leading-relaxed">
-                {PERSONAL_INFO.intro}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/20 mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span className="text-xs font-medium text-primary">{PERSONAL_INFO.role}</span>
+              </div>
+              <p className="text-base md:text-lg text-slate-600 font-normal max-w-xl leading-relaxed">
+                <span className="text-primary font-semibold">{'{'}</span> {PERSONAL_INFO.intro} <span className="text-primary font-semibold">{'}'}</span>
               </p>
             </motion.div>
           </div>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 items-start">
           {/* Info Section */}
           <section className="space-y-8 flex flex-col">
             <motion.div
@@ -167,23 +190,42 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="pt-6"
             >
-              <div className="flex gap-4">
-                {[
-                  { icon: Github, href: "https://github.com/liyingying", label: "GitHub" },
-                  { icon: Mail, href: "mailto:yingying.li@example.com", label: "Email" },
-                  { icon: Phone, href: "tel:+8613800138000", label: "Phone" }
-                ].map((item, i) => (
+              <div className="flex gap-4 items-center">
+                {isMobile ? (
                   <a 
-                    key={i}
-                    href={item.href} 
-                    target={item.icon === Github ? "_blank" : undefined}
-                    rel="noopener noreferrer"
+                    href={`tel:+86${phoneNumber}`} 
                     className="p-3 bg-slate-50 rounded-xl text-slate-600 hover:bg-primary hover:text-white transition-all shadow-sm"
-                    title={item.label}
+                    title="拨打电话"
                   >
-                    <item.icon className="w-5 h-5" />
+                    <Phone className="w-5 h-5" />
                   </a>
-                ))}
+                ) : (
+                  <button
+                    onClick={handleCopyPhone}
+                    className="flex items-center gap-2 px-3 py-3 bg-slate-50 rounded-xl text-slate-600 hover:bg-primary hover:text-white transition-all shadow-sm"
+                    title="复制电话号码"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span className="text-xs font-medium">{phoneNumber}</span>
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                )}
+                <a 
+                  href="mailto:1535249401@qq.com" 
+                  className="p-3 bg-slate-50 rounded-xl text-slate-600 hover:bg-primary hover:text-white transition-all shadow-sm"
+                  title="Email"
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://github.com/lyy-0118" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 bg-slate-50 rounded-xl text-slate-600 hover:bg-primary hover:text-white transition-all shadow-sm"
+                  title="GitHub"
+                >
+                  <Github className="w-5 h-5" />
+                </a>
               </div>
             </motion.div>
           </section>
@@ -193,16 +235,27 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
               className="h-full"
             >
-              <Card className="border-none shadow-xl h-full min-h-[500px] flex flex-col relative overflow-hidden bg-white">
-                <CardHeader className="border-b bg-white/80 backdrop-blur-md z-10 shrink-0 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                    <div>
-                      <CardTitle className="text-base font-bold text-slate-900">数字分身 LYY-AI</CardTitle>
-                      <CardDescription className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Online</CardDescription>
+              <Card className="border-2 border-primary/10 shadow-2xl shadow-primary/10 h-full min-h-[520px] flex flex-col relative overflow-hidden bg-gradient-to-br from-white to-primary/5">
+                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/10 to-transparent backdrop-blur-md z-10 shrink-0 py-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30">
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-white shadow-[0_0_6px_rgba(34,197,94,0.5)]" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base font-bold text-slate-900">数字分身 LYY-AI</CardTitle>
+                        <CardDescription className="text-[10px] font-medium text-primary uppercase tracking-wider">在线聊天</CardDescription>
+                      </div>
+                    </div>
+                    <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-primary/10">
+                      <span className="w-1 h-1 rounded-full bg-primary animate-pulse"></span>
+                      <span className="text-[10px] font-medium text-primary">AI 在线</span>
                     </div>
                   </div>
                 </CardHeader>
